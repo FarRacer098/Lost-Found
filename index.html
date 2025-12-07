@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lost & Found Item Manager</title>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #6ce8ee, #d795ef);
+        color: #222;
+        min-height: 100vh;
+        background-attachment: fixed;
+    }
+
+    .advanced-navbar {
+        width: 100%;
+        padding: 3px 0;
+        background: rgba(20, 20, 30, 0.85);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255,255,255,0.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 999;
+        box-shadow: 0 4px 25px rgba(0,0,0,0.2);
+    }
+
+    .nav-logo { margin-left: 55px; }
+    .nav-logo img {
+        height: 30px;
+        width: 70px;
+        transform: scale(1.8);
+        margin-top: 6.5px;
+    }
+
+    .nav-menu {
+        display: flex;
+        list-style: none;
+        gap: 40px;
+        margin-right: 20px;
+    }
+
+    .nav-menu li a {
+        text-decoration: none;
+        color: #f5f5f5;
+        font-size: 18px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .nav-menu li a:hover {
+        background: linear-gradient(135deg, #6ce8ee, #d795ef);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+    }
+
+    .hero {
+        margin-top: 130px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 50px;
+    }
+
+    .hero-text { max-width: 45%; }
+    .hero-text h1 { font-size: 42px; margin-bottom: 20px; }
+
+    .hero img {
+        width: 450px;
+        height: 260px;
+        object-fit: cover;
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .btn, .btns {
+        padding: 12px 25px;
+        border-radius: 8px;
+        margin-right: 15px;
+        display: inline-block;
+        cursor: pointer;
+        margin-top: 20px;
+        text-decoration: none;
+        font-weight: 600;
+        color: white;
+    }
+
+    .btn { background: #3b82f6; }
+    .btn:hover { background: #1e60d4; }
+
+    .btns { background: #16a34a; }
+    .btns:hover { background: #07722e; }
+
+
+    /* -------------------- FORM STYLING -------------------- */
+
+    .form-section {
+        width: 60%;
+        margin: 40px auto;
+        padding: 30px;
+        border-radius: 14px;
+        backdrop-filter: blur(15px);
+        background: rgba(255, 255, 255, 0.45);
+        border: 1px solid rgba(255,255,255,0.55);
+        box-shadow: 0 6px 25px rgba(0,0,0,0.25);
+        display: none;
+        transition: 0.3s ease;
+    }
+
+    /* LOST FORM STYLE */
+    #addLostForm {
+        border-left: 6px solid #ef4444;
+        box-shadow: 0 6px 25px rgba(239, 68, 68, 0.35);
+    }
+    #addLostForm h2 { color: #c53030; }
+    #addLostForm input:focus {
+        border-color: #ef4444;
+        box-shadow: 0 0 6px rgba(239, 68, 68, 0.5);
+    }
+
+    /* FOUND FORM STYLE */
+    #addFoundForm {
+        border-left: 6px solid #22c55e;
+        box-shadow: 0 6px 25px rgba(34, 197, 94, 0.35);
+    }
+    #addFoundForm h2 { color: #15803d; }
+    #addFoundForm input:focus {
+        border-color: #22c55e;
+        box-shadow: 0 0 6px rgba(34, 197, 94, 0.5);
+    }
+
+    .form-section input {
+        width: 97%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 15px;
+        transition: 0.25s;
+    }
+
+
+    /* -------------------- CARD THEME -------------------- */
+
+    .items-container {
+        padding: 30px 50px;
+        display: none;
+        margin: 100px auto;
+    }
+
+    #lostItemsList, #foundItemsList {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px;
+        margin-top: 30px;
+    }
+
+    @media (max-width: 900px) {
+        #lostItemsList, #foundItemsList { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 600px) {
+        #lostItemsList, #foundItemsList { grid-template-columns: 1fr; }
+    }
+
+    .item-card {
+        background: rgba(255, 255, 255, 0.65);
+        backdrop-filter: blur(12px);
+        padding: 22px;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.4);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.25), 0 4px 12px rgba(255,255,255,0.5) inset;
+        transition: 0.3s ease;
+    }
+
+    .item-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.35), 0 6px 14px rgba(255,255,255,0.6) inset;
+    }
+
+    .item-card h3 {
+        margin: 5px 0 10px 0;
+        font-size: 20px;
+        font-weight: 700;
+        color: #222;
+    }
+
+    .item-card p {
+        margin: 3px 0;
+        color: #333;
+        font-size: 14.5px;
+    }
+
+    .category-tag {
+        display: inline-block;
+        font-size: 13px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: white;
+    }
+
+    .lost { background: #ef4444; }
+    .found { background: #22c55e; }
+
+
+    /* DELETE BUTTON STYLE */
+    .delete-btn {
+        margin-top: 10px;
+        padding: 8px 16px;
+        background: rgba(255, 255, 255, 0.4);
+        border: 1px solid #ef4444;
+        border-radius: 25px;
+        font-size: 14px;
+        font-weight: bold;
+        color: #b91c1c;
+        cursor: pointer;
+        transition: 0.25s ease;
+        backdrop-filter: blur(8px);
+    }
+
+    .delete-btn:hover {
+        background: #ef4444;
+        color: white;
+        box-shadow: 0 6px 15px rgba(239, 68, 68, 0.4);
+        transform: translateY(-2px);
+    }
+
+</style>
+</head>
+
+<body onload="loadItems()">
+
+<!-- NAVBAR -->
+<nav class="advanced-navbar">
+    <div class="nav-logo"><img src="logo.jpg"></div>
+    <ul class="nav-menu">
+        <li><a onclick="showSection('addLostForm')">Report Lost Item</a></li>
+        <li><a onclick="showSection('addFoundForm')">Report Found Item</a></li>
+        <li><a onclick="showSection('lostItemsSection')">View Lost Items</a></li>
+        <li><a onclick="showSection('foundItemsSection')">View Found Items</a></li>
+    </ul>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="heroSection">
+    <div class="hero-text">
+        <h1 id="heroTitle">Recover Lost Items Easily</h1>
+        <p id="heroSubtitle">A dedicated system for reporting and searching lost & found items.</p>
+        <a class="btn" onclick="showSection('addLostForm')">Report Lost Item</a>
+        <a class="btns" onclick="showSection('addFoundForm')">Report Found Item</a>
+    </div>
+    <img id="heroimg" src="hero1.jpg">
+</div>
+
+<!-- LOST FORM -->
+<div id="addLostForm" class="form-section">
+    <h2>Report Lost Item</h2>
+    <form onsubmit="return addItem('lost')">
+        <input type="text" id="lostName" placeholder="Item Name" required>
+        <input type="text" id="lostLocation" placeholder="Location Lost" required>
+        <input type="number" id="lostContact" placeholder="Contact Number" oninput="this.value = this.value.slice(0,10)" required>
+        <input type="text" id="lostDesc" placeholder="Description" required>
+        <input type="datetime-local" id="lostdate">
+        <button class="btn" type="submit">Submit</button>
+    </form>
+</div>
+
+<!-- FOUND FORM -->
+<div id="addFoundForm" class="form-section">
+    <h2>Report Found Item</h2>
+    <form onsubmit="return addItem('found')">
+        <input id="foundName" placeholder="Item Name" required>
+        <input id="foundLocation" placeholder="Location Found" required>
+        <input type="number" id="foundContact" placeholder="Contact Number" oninput="this.value = this.value.slice(0,10)" required>
+        <input type="text" id="foundDesc" placeholder="Description" required>
+        <input type="datetime-local" id="founddate">
+        <button class="btn" type="submit">Submit</button>
+    </form>
+</div>
+
+<!-- LOST ITEMS -->
+<div id="lostItemsSection" class="items-container">
+    <h1 style="text-align:center;">Lost Items</h1>
+    <div id="lostItemsList"></div>
+</div>
+
+<!-- FOUND ITEMS -->
+<div id="foundItemsSection" class="items-container">
+    <h1 style="text-align:center;">Found Items</h1>
+    <div id="foundItemsList"></div>
+</div>
+
+
+<script>
+window.showSection = function(sectionId) {
+    ["addLostForm","addFoundForm","lostItemsSection","foundItemsSection"]
+        .forEach(id => document.getElementById(id).style.display = "none");
+
+    document.getElementById(sectionId).style.display = "block";
+
+    const hero = document.getElementById("heroSection");
+    const img = document.getElementById("heroimg");
+    const title = document.getElementById("heroTitle");
+    const subtitle = document.getElementById("heroSubtitle");
+
+    hero.style.display = sectionId.includes("Form") ? "flex" : "none";
+
+    if (sectionId === "addLostForm") {
+        img.src = "hero2.jpg";
+        title.textContent = "Lost something?";
+        subtitle.textContent = "Report your missing item and let our community help you get it back.";
+    }
+    else if (sectionId === "addFoundForm") {
+        img.src = "hero3.jpg";
+        title.textContent = "Found Something?";
+        subtitle.textContent = "Share what you discovered and help someone reclaim it.";
+    }
+
+    window.scrollTo(0,0);
+};
+
+async function addItem(type){
+    const item = {
+        category: type,
+        name: document.getElementById(type==="lost"?"lostName":"foundName").value,
+        location: document.getElementById(type==="lost"?"lostLocation":"foundLocation").value,
+        description: document.getElementById(type==="lost"?"lostDesc":"foundDesc").value,
+        contact: document.getElementById(type==="lost"?"lostContact":"foundContact").value,
+        date: document.getElementById(type==="lost"?"lostdate":"founddate").value
+    };
+
+    await fetch("http://localhost:3000/add-item",{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify(item)
+    });
+
+    alert("Item added successfully!");
+    loadItems();
+    return false;
+}
+
+async function loadItems(){
+    const res = await fetch("http://localhost:3000/items");
+    const items = await res.json();
+
+    const lostList = document.getElementById("lostItemsList");
+    const foundList = document.getElementById("foundItemsList");
+
+    lostList.innerHTML = "";
+    foundList.innerHTML = "";
+
+    items.forEach(item=>{
+        const card = `
+        <div class="item-card">
+            <span class="category-tag ${item.category}">${item.category.toUpperCase()}</span>
+            <h3>${item.name}</h3>
+            <p><b>Location:</b> ${item.location}</p>
+            <p>${item.description}</p>
+            <p><b>Contact:</b> ${item.contact}</p>
+            <p><b>Date:</b> ${item.date || "Not provided"}</p>
+
+            <button class="delete-btn" onclick="deleteItem('${item._id}')">
+                🗑 Delete
+            </button>
+        </div>`;
+
+        (item.category==="lost" ? lostList : foundList).innerHTML += card;
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const now = new Date();
+    const formatted =
+        `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")}T${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+
+    const lost = document.getElementById("lostdate");
+    const found = document.getElementById("founddate");
+
+    if(lost) lost.value = formatted;
+    if(found) found.value = formatted;
+});
+
+
+/* DELETE FUNCTION */
+async function deleteItem(id) {
+    if (!confirm("Are you sure you want to delete this item?")) return;
+
+    await fetch(`http://localhost:3000/delete-item/${id}`, {
+        method: "DELETE"
+    });
+
+    alert("Item deleted!");
+    loadItems();
+}
+</script>
+
+</body>
+</html>
